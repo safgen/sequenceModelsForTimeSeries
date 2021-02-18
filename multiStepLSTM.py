@@ -12,7 +12,7 @@ def get_encdec_model(n_steps_in, n_features, n_steps_out, n_units=100):
     model.add(LSTM(n_units, activation='relu', input_shape=(n_steps_in, n_features)))
     model.add(RepeatVector(n_steps_out))
     model.add(LSTM(n_units, activation='relu', return_sequences=True))
-    model.add(TimeDistributed(Dense(1)))
+    model.add(TimeDistributed(Dense(n_features)))
     model.compile(optimizer='adam', loss='mse')
     return model
 
@@ -34,22 +34,23 @@ def split_sequence(sequence, n_steps_in, n_steps_out):
     return array(X), array(y)
 
 
-# choose a number of time steps
-n_steps_in, n_steps_out = 3, 2
-# split into samples
-X, y = split_sequence(raw_seq, n_steps_in, n_steps_out)
-# reshape from [samples, timesteps] into [samples, timesteps, features]
-n_features = 1
-X = X.reshape((X.shape[0], X.shape[1], n_features))
-if EncoderDecoder:
-    y = y.reshape((y.shape[0], y.shape[1], n_features))
-    model = get_encdec_model(n_steps_in, n_features, n_steps_out)
-else:
-    model = get_stacked_lstm(n_steps_in, n_features, n_outputs=n_steps_out)
-# fit model
-model.fit(X, y, epochs=200, verbose=1)
-# demonstrate prediction
-x_input = array([70, 80, 90])
-x_input = x_input.reshape((1, n_steps_in, n_features))
-yhat = model.predict(x_input, verbose=0)
-print(yhat)
+if __name__ == '__main__':
+    # choose a number of time steps
+    n_steps_in, n_steps_out = 3, 2
+    # split into samples
+    X, y = split_sequence(raw_seq, n_steps_in, n_steps_out)
+    # reshape from [samples, timesteps] into [samples, timesteps, features]
+    n_features = 1
+    X = X.reshape((X.shape[0], X.shape[1], n_features))
+    if EncoderDecoder:
+        y = y.reshape((y.shape[0], y.shape[1], n_features))
+        model = get_encdec_model(n_steps_in, n_features, n_steps_out)
+    else:
+        model = get_stacked_lstm(n_steps_in, n_features, n_outputs=n_steps_out)
+    # fit model
+    model.fit(X, y, epochs=200, verbose=1)
+    # demonstrate prediction
+    x_input = array([70, 80, 90])
+    x_input = x_input.reshape((1, n_steps_in, n_features))
+    yhat = model.predict(x_input, verbose=0)
+    print(yhat)
