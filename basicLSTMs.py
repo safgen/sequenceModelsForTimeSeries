@@ -1,9 +1,10 @@
 from numpy import array
 from keras.models import Sequential
 from keras.layers import LSTM, Dense, Bidirectional, Conv1D, TimeDistributed, MaxPooling1D, Flatten, ConvLSTM2D
-
+from getSeqs import in_seq1 as raw_seq
 
 TYPE = "stackedLSTM"  # Type of univariate LSTM - Default = Vanilla LSTM
+
 
 # split a univariate sequence into samples
 def split_sequence(sequence, n_steps):
@@ -73,9 +74,6 @@ def get_conv_lstm(n_steps, n_features, filters=64):
 
 
 if __name__ == '__main__':
-    # define input sequence
-    raw_seq = [10, 20, 30, 40, 50, 60, 70, 80, 90]
-
     n_features = 1
     if TYPE not in ["CNNLSTM", "ConvLSTM"]:
         # choose a number of time steps
